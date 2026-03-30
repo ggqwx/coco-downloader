@@ -27,36 +27,33 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const downloadEnabled = process.env.NEXT_PUBLIC_ENABLE_DOWNLOAD === "1";
+  const announcementEnabled =
+    !downloadEnabled && process.env.NEXT_PUBLIC_ANNOUNCEMENT_ENABLED === "1";
+  const announcementText =
+    process.env.NEXT_PUBLIC_ANNOUNCEMENT_TEXT ??
+    "由于本站当前流量包达到上限，下载功能已临时关闭，将为你跳转到原链接。";
+
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 dark:bg-slate-950 transition-colors duration-300`}
       >
         <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-        <div className="sticky top-0 z-[60] w-full flex flex-col">
-          {/* Announcement Bar */}
-          {/* <div className="w-full bg-orange-50/90 dark:bg-orange-950/90 border-b border-orange-100 dark:border-orange-900 px-4 py-2 text-center text-xs sm:text-sm text-orange-800 dark:text-orange-200 flex flex-wrap items-center justify-center gap-1 backdrop-blur-sm transition-colors duration-300">
-            <span>本站默认提供完整的下载功能，若需完整体验第三方软件CoCoMusic，请访问</span>
-            <a 
-              href="https://coco.markqq.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="font-semibold underline hover:text-orange-600 dark:hover:text-orange-300 transition-colors"
-            >
-              CoCoMusic官网
-            </a>
-            <span>或加入qq群：774351610</span>
-          </div> */}
-          <Navbar />
-        </div>
-        <div className="min-h-screen">
-          {children}
-        </div>
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="sticky top-0 z-[60] w-full flex flex-col">
+            {announcementEnabled ? (
+              <div className="w-full bg-orange-50/90 dark:bg-orange-950/90 border-b border-orange-100 dark:border-orange-900 px-4 py-2 text-center text-xs sm:text-sm text-orange-800 dark:text-orange-200 flex flex-wrap items-center justify-center gap-1 backdrop-blur-sm transition-colors duration-300">
+                <span>{announcementText}</span>
+              </div>
+            ) : null}
+            <Navbar />
+          </div>
+          <div className="min-h-screen">{children}</div>
         </ThemeProvider>
       </body>
     </html>

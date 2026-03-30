@@ -72,6 +72,19 @@ export default function Home() {
   // Download Manager State
   const [downloadTasks, setDownloadTasks] = useState<DownloadTask[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const downloadEnabled = process.env.NEXT_PUBLIC_ENABLE_DOWNLOAD === "1";
+
+  const openSourceUrl = async (item: MusicItem) => {
+    const res = await fetch(
+      `/api/url?id=${encodeURIComponent(item.id)}&provider=${encodeURIComponent(item.provider || "gequbao")}`
+    );
+    const data = await res.json();
+    if (data?.url) {
+      window.open(data.url, "_blank");
+      return;
+    }
+    throw new Error("Failed to get source url");
+  };
 
   const buildShuffleOrder = (ids: string[]) => {
     const next = [...ids];
@@ -239,6 +252,14 @@ export default function Home() {
       setDownloadTasks(prev => prev.map(t => 
         t.id === task.id ? { ...t, status: 'downloading' } : t
       ));
+
+      if (!downloadEnabled) {
+        await openSourceUrl(task.musicItem);
+        setDownloadTasks(prev =>
+          prev.map(t => (t.id === task.id ? { ...t, status: "completed", progress: 100 } : t))
+        );
+        return;
+      }
 
       const response = await axios.get(`/api/download`, {
         params: {
@@ -745,9 +766,13 @@ export default function Home() {
                           <button
                             onClick={(e) => { e.stopPropagation(); downloadOne(item); }}
                             className="p-2 text-slate-400 dark:text-slate-500 hover:text-sky-500 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-slate-800 rounded-full transition-colors cursor-pointer"
-                            title="下载"
+                            title={downloadEnabled ? "下载" : "打开源链接"}
                           >
-                            <Download className="w-5 h-5" />
+                            {downloadEnabled ? (
+                              <Download className="w-5 h-5" />
+                            ) : (
+                              <ExternalLink className="w-5 h-5" />
+                            )}
                           </button>
                         </div>
                       </motion.div>

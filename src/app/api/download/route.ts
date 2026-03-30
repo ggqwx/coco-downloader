@@ -69,6 +69,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Failed to get url" }, { status: 404 });
     }
 
+    const downloadEnabled = process.env.NEXT_PUBLIC_ENABLE_DOWNLOAD === "1";
+    if (!downloadEnabled) {
+      return NextResponse.json(
+        { error: "Download disabled", url: playInfo.url },
+        { status: 503 }
+      );
+    }
+
     // 2. 请求音频流
     // 使用原生 fetch 以获取标准的 ReadableStream，完美兼容 NextResponse
     const { stream, headers: upstreamHeaders } = await requestAudioStream(playInfo.url);
