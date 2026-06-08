@@ -98,28 +98,28 @@
     </message>
     <message>
         <location filename="../../view/setting_interface.py" line="93"/>
-        <source>Open help page</source>
-        <translation>打开帮助页面</translation>
+        <source>打开项目主页</source>
+        <translation>打开项目主页</translation>
     </message>
     <message>
         <location filename="../../view/setting_interface.py" line="93"/>
-        <source>Help</source>
-        <translation>帮助</translation>
+        <source>项目主页</source>
+        <translation>项目主页</translation>
     </message>
     <message>
         <location filename="../../view/setting_interface.py" line="93"/>
-        <source>Discover new features and learn useful tips about Fluent Client</source>
-        <translation>发现并了解关于 Fluent Client 的新特性和最佳实践</translation>
+        <source>查看 coco-downloader 源码、发布记录和使用说明</source>
+        <translation>查看 coco-downloader 源码、发布记录和使用说明</translation>
     </message>
     <message>
         <location filename="../../view/setting_interface.py" line="102"/>
-        <source>Provide feedback</source>
-        <translation>提供反馈</translation>
+        <source>提交 Bug</source>
+        <translation>提交 Bug</translation>
     </message>
     <message>
         <location filename="../../view/setting_interface.py" line="102"/>
-        <source>Help us improve Fluent Client by providing feedback</source>
-        <translation>提供反馈以帮助我们改善 Fluent Client</translation>
+        <source>在 GitHub Issues 中反馈 coco-downloader 问题</source>
+        <translation>在 GitHub Issues 中反馈 coco-downloader 问题</translation>
     </message>
     <message>
         <location filename="../../view/setting_interface.py" line="109"/>

@@ -15,10 +15,14 @@ from .home_interface import HomeInterface
 from .setting_interface import SettingInterface
 from ..common.config import cfg
 from ..common.icon import Icon
+from ..common.setting import APP_LOGO_PATH
 from ..common.signal_bus import signalBus
 from ..common import resource
 from ..services.download_service import DownloadService
 from ..services.playback_service import PlaybackService
+
+
+TITLE_BAR_ICON_SIZE = 28
 
 
 class StackedWidget(QFrame):
@@ -57,7 +61,7 @@ class CustomTitleBar(TitleBar):
         self.hBoxLayout.removeWidget(self.closeBtn)
 
         self.iconLabel = QLabel(self)
-        self.iconLabel.setFixedSize(18, 18)
+        self.iconLabel.setFixedSize(TITLE_BAR_ICON_SIZE, TITLE_BAR_ICON_SIZE)
         self.hBoxLayout.insertSpacing(0, 20)
         self.hBoxLayout.insertWidget(1, self.iconLabel, 0, Qt.AlignLeft | Qt.AlignVCenter)
         self.window().windowIconChanged.connect(self.setIcon)
@@ -84,7 +88,7 @@ class CustomTitleBar(TitleBar):
         self.titleLabel.adjustSize()
 
     def setIcon(self, icon):
-        self.iconLabel.setPixmap(QIcon(icon).pixmap(18, 18))
+        self.iconLabel.setPixmap(QIcon(icon).pixmap(TITLE_BAR_ICON_SIZE, TITLE_BAR_ICON_SIZE))
 
 
 class MainWindow(FramelessWindow):
@@ -149,7 +153,7 @@ class MainWindow(FramelessWindow):
         self.addSubInterface(
             self.downloadInterface,
             FIF.CLOUD_DOWNLOAD,
-            '下载',
+            '下载任务',
         )
 
         self.addSubInterface(
@@ -165,7 +169,7 @@ class MainWindow(FramelessWindow):
     def initWindow(self):
         self.resize(1160, 880)
         self.setMinimumWidth(1060)
-        self.setWindowIcon(QIcon(':/app/images/logo.png'))
+        self.setWindowIcon(QIcon(APP_LOGO_PATH))
         self.setWindowTitle('Coco Downloader')
         self.titleBar.setAttribute(Qt.WA_StyledBackground)
 

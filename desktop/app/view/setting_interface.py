@@ -12,9 +12,12 @@ from PyQt5.QtGui import QDesktopServices, QFont
 from PyQt5.QtWidgets import QWidget, QLabel, QFileDialog
 
 from ..common.config import cfg, isWin11
-from ..common.setting import HELP_URL, FEEDBACK_URL, AUTHOR, VERSION, YEAR
+from ..common.setting import APP_LOGO_PATH, APP_NAME, AUTHOR, FEEDBACK_URL, HELP_URL, VERSION, YEAR
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
+
+
+ABOUT_CARD_ICON_SIZE = 36
 
 
 class SettingCardGroup(CardGroup):
@@ -115,25 +118,25 @@ class SettingInterface(ScrollArea):
         self.aboutGroup = SettingCardGroup(self.tr('About'), self.scrollWidget)
         self.helpCard = HyperlinkCard(
             HELP_URL,
-            self.tr('Open help page'),
+            self.tr('打开项目主页'),
             FIF.HELP,
-            self.tr('Help'),
+            self.tr('项目主页'),
             self.tr(
-                'Discover new features and learn useful tips about Fluent Client'),
+                '查看 coco-downloader 源码、发布记录和使用说明'),
             self.aboutGroup
         )
         self.feedbackCard = PrimaryPushSettingCard(
-            self.tr('Provide feedback'),
+            self.tr('提交 Bug'),
             FIF.FEEDBACK,
-            self.tr('Provide feedback'),
-            self.tr('Help us improve Fluent Client by providing feedback'),
+            self.tr('提交 Bug'),
+            self.tr('在 GitHub Issues 中反馈 coco-downloader 问题'),
             self.aboutGroup
         )
         self.aboutCard = PrimaryPushSettingCard(
             self.tr('Check update'),
-            ":/qfluentwidgets/images/logo.png",
+            APP_LOGO_PATH,
             self.tr('About'),
-            '© ' + self.tr('Copyright') + f" {YEAR}, {AUTHOR}. " +
+            f"© {YEAR}, {AUTHOR}. {APP_NAME}. " +
             self.tr('Version') + " " + VERSION,
             self.aboutGroup
         )
@@ -156,6 +159,7 @@ class SettingInterface(ScrollArea):
         self.scrollWidget.setStyleSheet("QWidget{background:transparent}")
 
         self.micaCard.setEnabled(isWin11())
+        self._resize_about_logo()
 
         # initialize layout
         self.__initLayout()
@@ -210,6 +214,9 @@ class SettingInterface(ScrollArea):
         # about
         self.feedbackCard.clicked.connect(
             lambda: QDesktopServices.openUrl(QUrl(FEEDBACK_URL)))
+
+    def _resize_about_logo(self):
+        self.aboutCard.iconLabel.setFixedSize(ABOUT_CARD_ICON_SIZE, ABOUT_CARD_ICON_SIZE)
 
     def _onDownloadFolderCardClicked(self):
         """Handle download folder selection."""

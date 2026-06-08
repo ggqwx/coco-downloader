@@ -6,7 +6,7 @@ Fluent window skeleton of [QFluentWidgets](https://github.com/zhiyiYo/PyQt-Fluen
 root
 │  deploy.py                (Nuikta deploy script)
 │  main.pro                 (Qt project file)
-│  main.py                  (Entry script)
+│  CoCo-downloader.py       (Entry script)
 │  requirements.txt         (Dependency file)
 │
 └─app
