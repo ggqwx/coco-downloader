@@ -193,22 +193,25 @@ export class NeteaseOfficialProvider implements MusicProvider {
   async getPlayInfo(id: string, extra?: unknown): Promise<PlayInfo> {
     const payload = extra as { cover?: string; level?: string; selectedLevel?: string } | undefined;
     const level = normalizeLevel(payload?.level || payload?.selectedLevel);
+
+    // Try Meting API first since cenguigui is currently unavailable
     try {
-      const info = await this.getByCenguigui(id, level);
-      return {
-        url: info.url,
-        type: extractExt(info.url),
-        bitrate: info.bitrate,
-        cover: info.cover || payload?.cover,
-      };
-    } catch (error) {
-      console.error('Netease cenguigui play url error:', error);
       const info = await this.getByMeting(id, level);
       return {
         url: info.url,
         type: extractExt(info.url),
         bitrate: info.bitrate,
         cover: payload?.cover,
+      };
+    } catch (error) {
+      console.error('Netease meting play url error:', error);
+      // Fallback to cenguigui (though it's currently down)
+      const info = await this.getByCenguigui(id, level);
+      return {
+        url: info.url,
+        type: extractExt(info.url),
+        bitrate: info.bitrate,
+        cover: info.cover || payload?.cover,
       };
     }
   }
@@ -318,16 +321,41 @@ export class NeteaseOfficialProvider implements MusicProvider {
 
   private async getByMeting(id: string, level: string) {
     const br = METING_BR_BY_LEVEL[level] || '320';
-    const { data } = await axios.get(METING_API_URL, {
-      params: { server: 'netease', type: 'url', id, br },
-      timeout: REQUEST_TIMEOUT,
-      responseType: 'text',
-    });
-    const url = this.extractMetingUrl(String(data || ''));
-    if (!isHttpUrl(url)) {
-      throw new Error('Invalid meting url');
+    try {
+      const response = await axios.get(METING_API_URL, {
+        params: { server: 'netease', type: 'url', id, br },
+        timeout: REQUEST_TIMEOUT,
+        responseType: 'text',
+        maxRedirects: 0,
+        validateStatus: (status) => status === 302 || (status >= 200 && status < 300),
+      });
+
+      // If 302, get URL from Location header
+      if (response.status === 302) {
+        const url = response.headers.location;
+        if (!isHttpUrl(url)) {
+          throw new Error('Invalid meting redirect url');
+        }
+        return { url, bitrate: br };
+      }
+
+      // Otherwise try to extract from response body
+      const url = this.extractMetingUrl(String(response.data || ''));
+      if (!isHttpUrl(url)) {
+        throw new Error('Invalid meting url');
+      }
+      return { url, bitrate: br };
+    } catch (error) {
+      // axios throws on 3xx when maxRedirects: 0, catch and extract Location
+      if (axios.isAxiosError(error) && error.response?.status === 302) {
+        const url = error.response.headers.location;
+        if (!isHttpUrl(url)) {
+          throw new Error('Invalid meting redirect url');
+        }
+        return { url, bitrate: br };
+      }
+      throw error;
     }
-    return { url, bitrate: br };
   }
 
   private extractMetingUrl(responseText: string) {
